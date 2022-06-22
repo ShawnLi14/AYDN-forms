@@ -109,6 +109,10 @@ class Aydn_Forms_Loader {
 
 	}
 
+	function aydn_new_user_notification_email( $email ) {
+		$email['message'] = "You have been approved as an official AYDN volunteer. Your username is displayed below.\r\n\r\n" . $email['message'] . "\r\n" . 'To access your AYDN dashboard, go to https://www.aydnetwork.org/my-aydn/.';
+		return $email;
+	}
 	/**
 	 * Register the filters and actions with WordPress.
 	 *
@@ -119,6 +123,7 @@ class Aydn_Forms_Loader {
 		foreach ( $this->filters as $hook ) {
 			add_filter( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
 		}
+		add_filter( 'wp_new_user_notification_email', array($this,'aydn_new_user_notification_email'));
 
 		foreach ( $this->actions as $hook ) {
 			add_action( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );

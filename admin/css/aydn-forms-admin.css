@@ -2,3 +2,27 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+.aydn .table{
+  width: 95%;
+  border-spacing: 0px;
+  border: solid 1px #666;
+}
+.aydn .table th, td{
+  padding: 4px;
+  text-align: center;
+}
+.aydn .row{
+  clear: both;
+  overflow: hidden;
+  width: 100%;
+}
+.aydn .col-6{
+  float: left;
+  width: 48%;
+  padding: 5px 1%;
+}
+.aydn span.title{
+  display: inline-block;
+  font-weight: bold;
+  width: 150px;
+}

@@ -2,3 +2,22 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+.table{
+  width: 100%;
+}
+.table th, td{
+  padding: 4px;
+}
+span.title{
+  display: inline-block;
+  font-weight: bold;
+  width: 150px;
+}
+#my_aydn a.btn{
+  width: auto;
+  color: #fff;
+  text-decoration: none;
+}
+input[type="date"]{
+  margin-bottom: 23px;
+}

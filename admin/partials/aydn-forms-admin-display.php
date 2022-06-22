@@ -14,3 +14,217 @@
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
+<div id="wrap" class="aydn">
+	<h1>AYDN Admin Console</h1>
+		<?php
+			// get current page uri		  		
+			$uri = $_SERVER['REQUEST_URI'];
+
+			echo "<form method=\"post\" action=\"$uri\" id=\"aydn-admin\">";
+
+			// get database handler
+		 	global $wpdb;
+		  	$charset_collate = $wpdb->get_charset_collate();
+		  	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		 	$volunteers_tablename = $wpdb->prefix."aydn_volunteers";
+		 	$courses_tablename = $wpdb->prefix."aydn_courses";
+		 	$hours_tablename = $wpdb->prefix."aydn_hours";
+
+			// view details for volunteer with vid
+			if(isset($_GET['vid'])){
+
+				//get volunteer id
+				$vid = $_GET['vid'];
+				// pull volunteer info
+				$sql = "SELECT * from $volunteers_tablename where id='%d'";
+				$volunteer_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
+				$volunteer = $volunteer_results[0];
+
+				//approve volunteer
+				if(isset($_POST['approve_volunteer'])){
+					$wpdb->update($volunteers_tablename, array('status'=>'Approved'), array('id'=>$vid));
+					$user_id = wp_insert_user( array(
+					  'user_login' => $volunteer->email,
+					  'user_pass' => NULL,
+					  'user_email' => $volunteer->email,
+					  'first_name' => $volunteer->firstname,
+					  'last_name' => $volunteer->lastname,
+					  'display_name' => $volunteer->name,
+					  'role' => 'subscriber'
+					));
+					wp_new_user_notification( $user_id, null, 'both' );
+				}
+
+				//disapprove volunteer
+				if(isset($_POST['disapprove_volunteer'])){
+					$user = get_user_by('email', $volunteer->email);
+					if($user) wp_delete_user($user->ID);
+					$wpdb->update($volunteers_tablename, array('status'=>'Rejected'), array('id'=>$vid));
+				}
+
+				//approve course
+				if(isset($_POST['approve_course'])){
+					$cid = substr($_POST['approve_course'], 16);
+					$wpdb->update($courses_tablename, array('status'=>'Approved'), array('id'=>$cid));
+					echo $cid;
+				}
+
+				//disapprove course
+				if(isset($_POST['disapprove_course'])){
+					$cid = substr($_POST['disapprove_course'], 19);
+					$wpdb->update($courses_tablename, array('status'=>'Rejected'), array('id'=>$_POST['cid']));
+				}		
+				//approve hours
+				if(isset($_POST['approve_hours'])){
+					$hid = substr($_POST['approve_hours'], 15);
+					$wpdb->update($hours_tablename, array('status'=>'Approved'), array('id'=>$hid));
+				}
+
+				//disapprove hours
+				if(isset($_POST['disapprove_hours'])){
+					$hid = substr($_POST['approve_hours'], 18);
+					$wpdb->update($hours_tablename, array('status'=>'Rejected'), array('id'=>$hid));
+				}				
+
+				//pull course info
+				$sql = "SELECT * from $courses_tablename where volunteer_id='%d' order by title";
+				$courses_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
+
+				//pull hours info
+				$sql = "SELECT * from $hours_tablename where volunteer_id='%d'";
+				$hours_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
+
+				//breadcrumb
+				$homeURL = substr($uri, 0, strpos($uri, "vid")-1);
+				$breadcrumb = "<a href=\"$homeURL\">Admin Home</a> > Volunteer Details - $volunteer->name";
+				/*if(isset($_GET['cid'])){
+					$cid = $_GET['cid'];
+					$sql = "SELECT * from $courses_tablename where id='%d'";
+					$id_course_results = $wpdb->get_results($wpdb->prepare($sql, $cid));
+					$course = $id_course_results[0];
+					$breadcrumb = $breadcrumb . " > Course Details - $course->title";
+				}*/
+				// display volunteer personal information
+				echo "$breadcrumb<br><br>";
+				echo '<input class="ui-button ui-widget ui-corner-all" name="approve_volunteer" type="submit" value="Approve Volunteer" onclick="return confirm('."'Do you want to approve $volunteer->firstname $volunteer->lastname as an official AYDN volunteer? This will create an Wordpress account for them.'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_volunteer" type="submit" value="Disapprove Volunteer" onclick="return confirm('."'Do you want to DENY $volunteer->firstname $volunteer->lastname from being an official AYDN volunteer?'".')" style="background-color: darkred;color:white;"><br /><br />';
+				echo "<div class=\"row\">";
+				echo "<div class=\"col-6\">";
+				echo "<span class=\"title\">First Name:</span>$volunteer->firstname<br>";
+				echo "<span class=\"title\">Last Name:</span>$volunteer->lastname<br>";
+				echo "<span class=\"title\">Display Name:</span>$volunteer->name<br>";
+				echo "<span class=\"title\">AYDN #:</span>$volunteer->aydn_number<br>";
+				echo "</div>";
+				echo "<div class=\"col-6\">";
+				echo "<span class=\"title\">Email:</span>$volunteer->email<br>";
+				echo "<span class=\"title\">Status:</span>$volunteer->status<br>";
+				echo "<span class=\"title\">Birth Date:</span>$volunteer->birthdate<br>";
+				echo "<span class=\"title\">Parent Contact:</span>$volunteer->parent_contact<br>";				
+				echo "</div></div>";
+				echo "<div class=\"row\" id=\"resume\">";
+				echo "<h3>Resume:</h3><div>";
+				echo nl2br($volunteer->resume);
+				echo "</div></div>";
+				// display courses by this volunteer
+				echo "<h2>$volunteer->name's Courses</h2>";
+				echo '<div id="accourses">';
+				foreach ($courses_results as $course) {			
+					$status_color = ($course->status == "Approved") ? "lightgreen" : (($course->status == "New") ? "yellow" : "#999");
+					echo "<h3>Course Title: $course->title | Status: <span style=\"background-color: $status_color; padding: 4px\">$course->status</span></h3><div>";
+					echo '<div class="row">';
+					echo "<div class=\"col-6\">";
+						echo "<span class=\"title\">Duration:</span>$course->duration<br>";
+						echo "<span class=\"title\">Photo Consent:</span>$course->photo_consent<br>";
+						echo "<span class=\"title\">Capacity:</span>$course->capacity<br>";
+						echo "<span class=\"title\">Status:</span>$course->status<br>";
+					echo "</div>";
+					echo "<div class=\"col-6\">";
+						echo "<span class=\"title\">Start Date:</span>$course->start_date<br>";
+						echo "<span class=\"title\">Start Time:</span>$course->start_time<br>";
+						echo "<span class=\"title\">Length:</span>$course->length<br>";
+						echo "<span class=\"title\">Time Zone:</span>$course->time_zone<br>";
+					echo "</div>";
+					echo "</div>";
+					echo "
+					<br><br>
+					<div class=\"row\">
+						<span class=\"title\">Course Description:</span><br>$course->introduction
+					</div>
+					<div class=\"row\">
+						<span class=\"title\">Course Syllabus:</span><br>$course->syllabus
+					</div>
+					<div class=\"row\">
+						<span class=\"title\">Extra Notes:</span><br>$course->note
+					</div>";
+					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_course" type="submit" value="Approve Course #'.$course->id.'" onclick="return confirm('."'Do you want to approve course $course->title as an official AYDN course?'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_course" type="submit" value="Disapprove Course #'.$course->id.'" onclick="return confirm('."'Do you want to DENY $course->title from being an official AYDN course?'".')" style="background-color: darkred;color:white;"><br /><br />';
+					echo"
+					</div>
+					";
+
+				}
+				echo "</div>";
+
+				// display courses by this volunteer
+				echo "<h2>$volunteer->name's Hours</h2>";
+				echo '<div id="achours">';
+				foreach ($hours_results as $entry) {	
+					$status_color = ($entry->status == "Approved") ? "lightgreen" : (($entry->status == "New") ? "yellow" : "#999");
+					echo "<h3>$entry->event_date  -  $entry->event_type | status: <span style=\"background-color: $status_color; padding: 4px\">$entry->status</span></h3><div>";
+					echo '<div class="row">';
+					echo "<div class=\"col-6\">";
+						echo "<span class=\"title\">Start Time:</span>$entry->start_time<br>";
+						echo "<span class=\"title\">Hours:</span>$entry->hours<br>";
+						echo "<span class=\"title\">Extra Hours:</span>$entry->extra_hours<br>";
+					echo "</div>";
+					echo "<div class=\"col-6\">";
+						echo "<span class=\"title\">End Time:</span>$entry->end_time<br>";
+						echo "<span class=\"title\">Total Hours:</span>$entry->total_hours<br>";
+						echo "<span class=\"title\">Status:</span>$entry->status<br>";
+					echo "</div>";
+					echo "</div>";
+					echo "
+					<br><br>
+					<div class=\"row\">
+						<span class=\"title\">Course Description:</span><br>$entry->event_description
+					</div>
+					<div class=\"row\">
+						<span class=\"title\">Extra Notes:</span><br>$entry->others
+					</div>";
+					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_hours" type="submit" value="Approve Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to approve this submission?'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_hours" type="submit" value="Disapprove Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to DENY this submission?'".')" style="background-color: darkred;color:white;"><br /><br />';
+					echo"
+					</div>
+					";
+
+				}
+				echo "</div>";
+			}
+
+			else{
+			 	// pull volunteer list
+			 	$sql = "SELECT * from $volunteers_tablename";  
+			  	$results = $wpdb->get_results($sql);
+			  	echo '<table class="table"><tr style="background-color:cornsilk;">
+			  	<th>First Name</th>
+			  	<th>Last Name</th>
+			  	<th>AYDN #</th>
+			  	<th>Email</th>
+			  	<th>Status</th>
+			  	<th></th>
+			  	</tr>';
+			  	$bgcolor = '#fff';
+			  	for($i = 0; $i < count($results); $i++){
+			  		if($i % 2 == 0) $bgcolor = '#eee';
+			  		else $bgcolor = '#fff';
+			  		echo "<tr style=\"background-color:$bgcolor;\">";
+			  		echo "<td>".$results[$i]->firstname."</td>";
+			  		echo "<td>".$results[$i]->lastname."</td>";	  
+			  		echo "<td>".$results[$i]->aydn_number."</td>";	  
+			  		echo "<td>".$results[$i]->email."</td>";
+			  		echo "<td>".$results[$i]->status."</td>";	
+			  		echo '<td><a href="'.$uri.'&vid='.$results[$i]->id.'">View Details</a></td>';		
+			  		echo "</tr>";
+			  	}
+			  	echo "</table>";
+		    }
+		?>
+	</form>
+</div>

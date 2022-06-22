@@ -28,5 +28,19 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
+	$(document).ready(function() {
+        $( "#accourses" ).accordion({
+      		collapsible : true, 
+      		active : 'none'
+    	});
+    	$( "#achours" ).accordion({
+      		collapsible : true, 
+      		active : 'none'
+    	});
+    	$( "#resume" ).accordion({
+      		collapsible : true, 
+      		active : 'none'
+    	});
+    });
 
 })( jQuery );

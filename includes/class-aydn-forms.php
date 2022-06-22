@@ -139,10 +139,16 @@ class Aydn_Forms {
 
 		$plugin_i18n = new Aydn_Forms_i18n();
 		$plugin_public = new Aydn_Forms_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_admin = new Aydn_Forms_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-		$this->loader->add_action( 'admin_post_nopriv_process_signup_form', $plugin_public, 'process_signup_form' );
+		//$this->loader->add_action( 'admin_post_nopriv_process_signup_form', $plugin_public, 'process_signup_form' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_settings_page' );
+	}
 
+	private function myplugin_new_user_notification_email_callback( $email ) {
+		$email['message'] .= "\r\n" . 'Thank you for register on site.';
+		return $email;
 	}
 
 	/**
@@ -159,6 +165,7 @@ class Aydn_Forms {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+		add_filter( 'wp_new_user_notification_email', 'myplugin_new_user_notification_email_callback' );
 	}
 
 	/**

@@ -46,7 +46,22 @@ class Aydn_Forms_Activator {
 			// Insert the page and get its id.
 			$signup_page_id = wp_insert_post( $signup_page_args );
 			// Save page id to the database.
-			add_option( 'aydn_signup_form_id', $signup_page_id );       	
+			add_option( 'aydn_signup_form_id', $signup_page_id ); 
+		}
+
+		$page_title = 'My AYDN';
+        $page = get_page_by_title($page_title);
+        if(!isset($page->title)){
+			$my_aydn_page_args = array(
+				'post_title'   => __( $page_title, 'my_aydn' ),
+				'post_content' => '[my_aydn]',
+				'post_status'  => 'publish',
+				'post_type'    => 'page'
+			);
+			// Insert the page and get its id.
+			$my_aydn_page_id = wp_insert_post( $my_aydn_page_args );
+			// Save page id to the database.
+			add_option( 'my_aydn_page_id', $my_aydn_page_id );     	      	
        }
 
 	}
@@ -65,12 +80,13 @@ class Aydn_Forms_Activator {
 	  firstname varchar(50) NOT NULL,
 	  lastname varchar(50) NOT NULL,
 	  birthdate date NOT NULL,
-	  username varchar(80) NOT NULL,
 	  email varchar(80) NOT NULL,
 	  aydn_number varchar(50) NOT NULL,
 	  resume varchar(65535),
 	  parent_contact varchar(255),
 	  status varchar(20) NOT NULL DEFAULT 'New',
+	  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ 	  date_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	  PRIMARY KEY  (id)
 	  ) $charset_collate;";  
 	  dbDelta( $sql );
@@ -81,13 +97,16 @@ class Aydn_Forms_Activator {
 	  volunteer_id mediumint(11) NOT NULL,
 	  event_type varchar(50),
 	  event_description varchar(65535),
-	  event_date datetime,
+	  event_date date,
 	  start_time datetime,
 	  end_time datetime,
 	  hours varchar(20),
 	  extra_hours varchar(20),
 	  total_hours varchar(20),
 	  others varchar(65535),
+	  status varchar(20) NOT NULL DEFAULT 'New',
+	  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ 	  date_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,	  
 	  PRIMARY KEY  (id),
 	  FOREIGN KEY (volunteer_id) REFERENCES $volunteers_tablename(id)
 	  ) $charset_collate;";  
@@ -109,6 +128,8 @@ class Aydn_Forms_Activator {
 	  photo_consent varchar(20),
 	  note varchar(65535),
 	  status varchar(20) NOT NULL DEFAULT 'New',
+	  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ 	  date_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,	  
 	  PRIMARY KEY  (id),
 	  FOREIGN KEY (volunteer_id) REFERENCES $volunteers_tablename(id)
 	  ) $charset_collate;";  
