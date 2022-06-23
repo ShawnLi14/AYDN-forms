@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       https://github.com/lizatgit/test
+ * @link       https://github.com/ShawnLi14/AYDN-forms
  * @since      1.0.0
  *
  * @package    Aydn_Forms
@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Aydn_Forms
  * @subpackage Aydn_Forms/includes
- * @author     Shamber Shepherd <shambershepherd@gmail.com>
+ * @author     Shawn Li <shmorganl14@gmail.com>
  */
 class Aydn_Forms_Deactivator {
 

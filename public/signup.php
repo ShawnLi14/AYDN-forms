@@ -120,6 +120,9 @@
 				<input type="radio" id="photo_consent_yes" name="photo_consent" checked="checked" class="form-check-input" value="YES">
 				<label class="form-check-label" for="photo_consent_yes">
 				   YES
+
+
+				   
 				</label>
 			<div class="form-check form-check-inline">
 			</div>

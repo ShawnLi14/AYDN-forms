@@ -14,7 +14,7 @@
 	 	$courses_tablename = $wpdb->prefix."aydn_courses";
 	 	$hours_tablename = $wpdb->prefix."aydn_hours";
 	 	$sql = "select h.* from $hours_tablename h join $volunteers_tablename v on h.volunteer_id = v.id
-	 	where v.email = '%s'";
+	 	where v.email = '%s' order by h.event_date";
 	 	$hours_results = $wpdb->get_results($wpdb->prepare($sql, $email));
 	 	$sql = "select c.* from $courses_tablename c join $volunteers_tablename v on c.volunteer_id = v.id
 	 	where v.email = '%s'";
@@ -34,6 +34,7 @@
 	 		if(isset($_POST['hours_submit'])){
 	 			$hours_entry = array(
 	 				'event_type' => $_POST['event_type'],
+					'event_name' => $_POST['event_name'],
 	 				'event_date' => $_POST['event_date'],
 	 				'event_description' => $_POST['event_description'],
 	 				'start_time' => date('Y-m-d H:i:s',strtotime($_POST['event_date'] . " " . $_POST['start_time'])),
@@ -79,7 +80,20 @@
 	 		}
 	 		else require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/courses.php';
 	 	}
-	 	else{?>
+	 	else{
+			// find out the min and max date for hours submissions
+			$min_date = null;
+			$max_date = null;
+			if(count($hours_results) > 0){
+				$min_date = $hours_results[0]->event_date;
+				$max_date = $min_date;
+				foreach ($hours_results as $entry) {
+					if(strcmp($entry->event_date, $max_date) > 0) $max_date = $entry->event_date;
+					if(strcmp($entry->event_date, $min_date) < 0) $min_date = $entry->event_date;
+				}				
+			}
+
+			?>
 			<h4>My Profile</h4>
 			<div class="row">
 				<div class="col-6">
@@ -102,18 +116,20 @@
 				    View Hours Submission History
 				</button>
 		   		<div class="collapse" id="hoursSubmissionHistory">
-				  	<div class="card card-body">
+				  	<div><br /><br />
 						Start Date
-						<input type="date" style="width: 200px;" id="hours_search_start_date"/>
+						<input type="date" style="width: 200px;" id="hours_search_start_date" value="<?php echo $min_date; ?>" />
 						End Date
-						<input type="date" style="width: 200px;" id="hours_search_end_date"/>
-						<button type="button" id="hours_search" class="btn btn-primary">Filter</button>
+						<input type="date" style="width: 200px;" id="hours_search_end_date"  value="<?php echo $max_date; ?>"/>
+						<div class="d-grid gap-2 col-6 mx-auto">
+							<button type="button" id="hours_search" class="btn btn-primary">Filter By Date Range</button><br /><br />
+						</div>
 				   		<?php
 				   			echo '
 					 			<table class="table table-striped table-bordered" id="hours_table">
 					 		';
 					 		echo '<tr>
-					 			<th>Event Type</th>
+					 			<th>Event</th>
 					 			<th>Event Date</th>
 					 			<th>Hours</th>
 					 			<th>Extra Hours</th>
@@ -132,12 +148,12 @@
 						 		$end_time = DateTime::createFromFormat($format, $entry->end_time);
 						 		echo "
 						 			<tr id=\"hours_row_$i\" class=\"hours_row\">
-						 			<td>$entry->event_type</td>
+						 			<td>$entry->event_type<br />$entry->event_name</td>
 						 			<td><span class=\"event_date\">".substr($entry->event_date, 0, 10)."</span><br>".$start_time->format('H:i A')." - ".$end_time->format('H:i A')."</td>
 						 			<td>$entry->hours</td>
 						 			<td>$entry->extra_hours</td>
 									<td class=\"total_hours\">$entry->total_hours</td>
-						 			<td style=\"background-color: $status_color\">$entry->status</td>
+						 			<td class=\"hours_status\" style=\"background-color: $status_color\">$entry->status</td>
 						 			</tr>
 						 		";
 								$i++;

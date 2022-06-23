@@ -18,6 +18,9 @@ span.title{
   color: #fff;
   text-decoration: none;
 }
-input[type="date"]{
+#my_aydn input, #my_aydn select, #signup-form input{
   margin-bottom: 23px;
+}
+select.heightFix{
+  height: auto;
 }

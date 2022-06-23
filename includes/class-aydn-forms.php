@@ -6,7 +6,7 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       https://github.com/lizatgit/test
+ * @link       https://github.com/ShawnLi14/AYDN-forms
  * @since      1.0.0
  *
  * @package    Aydn_Forms
@@ -25,7 +25,7 @@
  * @since      1.0.0
  * @package    Aydn_Forms
  * @subpackage Aydn_Forms/includes
- * @author     Shamber Shepherd <shambershepherd@gmail.com>
+ * @author     Shawn Li <shmorganl14@gmail.com>
  */
 class Aydn_Forms {
 
@@ -146,11 +146,6 @@ class Aydn_Forms {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_settings_page' );
 	}
 
-	private function myplugin_new_user_notification_email_callback( $email ) {
-		$email['message'] .= "\r\n" . 'Thank you for register on site.';
-		return $email;
-	}
-
 	/**
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
@@ -165,7 +160,6 @@ class Aydn_Forms {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
-		add_filter( 'wp_new_user_notification_email', 'myplugin_new_user_notification_email_callback' );
 	}
 
 	/**

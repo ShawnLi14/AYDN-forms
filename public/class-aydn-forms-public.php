@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://github.com/lizatgit/test
+ * @link       https://github.com/ShawnLi14/AYDN-forms
  * @since      1.0.0
  *
  * @package    Aydn_Forms
@@ -18,7 +18,7 @@
  *
  * @package    Aydn_Forms
  * @subpackage Aydn_Forms/public
- * @author     Shamber Shepherd <shambershepherd@gmail.com>
+ * @author     Shawn Li <shmorganl14@gmail.com>
  */
 class Aydn_Forms_Public {
 

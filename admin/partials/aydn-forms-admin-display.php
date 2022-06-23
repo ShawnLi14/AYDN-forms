@@ -5,7 +5,7 @@
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link       https://github.com/lizatgit/test
+ * @link       https://github.com/ShawnLi14/AYDN-forms
  * @since      1.0.0
  *
  * @package    Aydn_Forms
@@ -66,13 +66,12 @@
 				if(isset($_POST['approve_course'])){
 					$cid = substr($_POST['approve_course'], 16);
 					$wpdb->update($courses_tablename, array('status'=>'Approved'), array('id'=>$cid));
-					echo $cid;
 				}
 
 				//disapprove course
 				if(isset($_POST['disapprove_course'])){
 					$cid = substr($_POST['disapprove_course'], 19);
-					$wpdb->update($courses_tablename, array('status'=>'Rejected'), array('id'=>$_POST['cid']));
+					$wpdb->update($courses_tablename, array('status'=>'Rejected', 'deny_reason'=>$_POST['courses_deny_reason'.$cid]), array('id'=>$cid));
 				}		
 				//approve hours
 				if(isset($_POST['approve_hours'])){
@@ -82,8 +81,31 @@
 
 				//disapprove hours
 				if(isset($_POST['disapprove_hours'])){
-					$hid = substr($_POST['approve_hours'], 18);
-					$wpdb->update($hours_tablename, array('status'=>'Rejected'), array('id'=>$hid));
+					$hid = substr($_POST['disapprove_hours'], 18);
+					$wpdb->update($hours_tablename, array('status'=>'Rejected', 'deny_reason'=>$_POST['hours_deny_reason'.$hid]), array('id'=>$hid));
+					
+					//get hour entry info
+					$sql = "SELECT * from $hours_tablename where id='%d'";
+					$hours_entry = $wpdb->get_results($wpdb->prepare($sql, $hid))[0];
+					
+					//send denial email
+					$subject = "Your AYDN hours submission was denied.";
+					$body = "The hours you submitted have been denied. See details below.<br />
+					<strong>Event Name: </strong> $hours_entry->event_name<br />
+					<strong>Event Type: </strong> $hours_entry->event_type<br />
+					<strong>Event Description: </strong> $hours_entry->event_description<br />
+					<strong>Event Date: </strong> $hours_entry->event_date<br />
+					<strong>Start Time: </strong> $hours_entry->start_time<br />
+					<strong>End Time: </strong> $hours_entry->end_time<br />
+					<strong>Hours: </strong> $hours_entry->hours<br />
+					<strong>Extra Hours: </strong> $hours_entry->extra_hours<br />
+					<strong>Total Hours: </strong> $hours_entry->total_hours<br />
+					<strong>Others: </strong> $hours_entry->others<br />
+					<strong>Reason for Denial: </strong> $hours_entry->deny_reason<br />
+					";
+					$headers = array('Content-Type: text/html; charset=UTF-8');
+					
+					wp_mail($volunteer->email, $subject, $body, $headers);
 				}				
 
 				//pull course info
@@ -156,14 +178,14 @@
 						<span class=\"title\">Extra Notes:</span><br>$course->note
 					</div>";
 					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_course" type="submit" value="Approve Course #'.$course->id.'" onclick="return confirm('."'Do you want to approve course $course->title as an official AYDN course?'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_course" type="submit" value="Disapprove Course #'.$course->id.'" onclick="return confirm('."'Do you want to DENY $course->title from being an official AYDN course?'".')" style="background-color: darkred;color:white;"><br /><br />';
-					echo"
+					echo"<textarea style=\"width:100%;\" name=\"courses_deny_reason$course->id\" placeholder=\"Reason For Denial\">$course->deny_reason</textarea>
 					</div>
 					";
 
 				}
 				echo "</div>";
 
-				// display courses by this volunteer
+				// display hours by this volunteer
 				echo "<h2>$volunteer->name's Hours</h2>";
 				echo '<div id="achours">';
 				foreach ($hours_results as $entry) {	
@@ -190,6 +212,7 @@
 						<span class=\"title\">Extra Notes:</span><br>$entry->others
 					</div>";
 					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_hours" type="submit" value="Approve Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to approve this submission?'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_hours" type="submit" value="Disapprove Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to DENY this submission?'".')" style="background-color: darkred;color:white;"><br /><br />';
+					echo "<textarea style=\"width:100%;\" name=\"hours_deny_reason$entry->id\" placeholder=\"Reason For Denial\">$entry->deny_reason</textarea>";
 					echo"
 					</div>
 					";

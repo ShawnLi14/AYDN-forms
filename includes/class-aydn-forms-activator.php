@@ -3,7 +3,7 @@
 /**
  * Fired during plugin activation
  *
- * @link       https://github.com/lizatgit/test
+ * @link       https://github.com/ShawnLi14/AYDN-forms
  * @since      1.0.0
  *
  * @package    Aydn_Forms
@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Aydn_Forms
  * @subpackage Aydn_Forms/includes
- * @author     Shamber Shepherd <shambershepherd@gmail.com>
+ * @author     Shawn Li <shmorganl14@gmail.com>
  */
 class Aydn_Forms_Activator {
 
@@ -96,6 +96,7 @@ class Aydn_Forms_Activator {
 	  id mediumint(11) NOT NULL AUTO_INCREMENT,
 	  volunteer_id mediumint(11) NOT NULL,
 	  event_type varchar(50),
+	  event_name varchar(250),
 	  event_description varchar(65535),
 	  event_date date,
 	  start_time datetime,
@@ -104,6 +105,7 @@ class Aydn_Forms_Activator {
 	  extra_hours varchar(20),
 	  total_hours varchar(20),
 	  others varchar(65535),
+	  deny_reason varchar(65535),
 	  status varchar(20) NOT NULL DEFAULT 'New',
 	  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  	  date_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,	  
@@ -127,6 +129,7 @@ class Aydn_Forms_Activator {
 	  capacity varchar(50),
 	  photo_consent varchar(20),
 	  note varchar(65535),
+	  deny_reason varchar(65535),
 	  status varchar(20) NOT NULL DEFAULT 'New',
 	  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  	  date_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,	  
