@@ -41,6 +41,34 @@
       		collapsible : true, 
       		active : 'none'
     	});
+		$('#hours_search').on('click', function(index) {
+			var totalHours = 0;
+			var approvedHours = 0;
+			var start_date = Date.parse($('#hours_search_start_date').val());
+			var end_date = Date.parse($('#hours_search_end_date').val());
+			var alertMessage = "Please enter the following: ";
+			var datesSet = !isNaN(end_date) && !isNaN(start_date);
+			if(isNaN(start_date)) alertMessage += "start date; ";
+			if(isNaN(end_date)) alertMessage += "end date; ";
+			if(datesSet){
+				$('#achours .hours_row').each(function() {
+					var date = Date.parse($(this).find('.event_date').text());
+					if(date <= end_date && date >= start_date){
+						totalHours += parseInt($(this).find('.total_hours').text());
+						if($(this).find('.hours_status').text() == "Approved") approvedHours += parseInt($(this).find('.total_hours').text());
+						$(this).show();
+						$(this).parent().prev().show();
+					}
+					else{
+						$(this).hide()
+						$(this).parent().prev().hide();
+					}
+				});
+			}
+			else{alert(alertMessage);}
+			$('#hours_submitted').text(totalHours);
+			$('#hours_approved').text(approvedHours);
+		});
     });
 
 })( jQuery );

@@ -12,7 +12,7 @@
 			  <option value="cohosting">Co-hosting</option>
 			  <option value="other">Other Event</option>			  
 			</select>
-			<label class="form-label" for="event_name">Event Name</label>
+			<label class="form-label" for="event_name">Event Name/Course Title</label>
 			<input type="text" id="event_name" name="event_name" class="form-control" required>
 			<label class="form-label" for="event_description">Event Description</label>
 			<input type="text" id="event_description" name="event_description" class="form-control">

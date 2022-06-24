@@ -90,7 +90,7 @@
 					
 					//send denial email
 					$subject = "Your AYDN hours submission was denied.";
-					$body = "The hours you submitted have been denied. See details below.<br />
+					$body = "The hours you submitted have been denied. See details below.<br /><br />
 					<strong>Event Name: </strong> $hours_entry->event_name<br />
 					<strong>Event Type: </strong> $hours_entry->event_type<br />
 					<strong>Event Description: </strong> $hours_entry->event_description<br />
@@ -113,19 +113,29 @@
 				$courses_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
 
 				//pull hours info
-				$sql = "SELECT * from $hours_tablename where volunteer_id='%d'";
+				$sql = "SELECT * from $hours_tablename where volunteer_id='%d' order by event_date";
 				$hours_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
+
+				//calculate total hours
+				$total_hours_submitted = 0;
+				$total_hours_approved = 0;
+				$min_date = null;
+				$max_date = null;
+				if(count($hours_results) > 0){
+					$min_date = $hours_results[0]->event_date;
+					$max_date = $min_date;
+					foreach($hours_results as $entry){
+						$total_hours_submitted += $entry->total_hours;
+						if($entry->status == "Approved") $total_hours_approved += $entry->total_hours;
+						if(strcmp($entry->event_date, $max_date) > 0) $max_date = $entry->event_date;
+						if(strcmp($entry->event_date, $min_date) < 0) $min_date = $entry->event_date;
+					}
+				}
 
 				//breadcrumb
 				$homeURL = substr($uri, 0, strpos($uri, "vid")-1);
 				$breadcrumb = "<a href=\"$homeURL\">Admin Home</a> > Volunteer Details - $volunteer->name";
-				/*if(isset($_GET['cid'])){
-					$cid = $_GET['cid'];
-					$sql = "SELECT * from $courses_tablename where id='%d'";
-					$id_course_results = $wpdb->get_results($wpdb->prepare($sql, $cid));
-					$course = $id_course_results[0];
-					$breadcrumb = $breadcrumb . " > Course Details - $course->title";
-				}*/
+
 				// display volunteer personal information
 				echo "$breadcrumb<br><br>";
 				echo '<input class="ui-button ui-widget ui-corner-all" name="approve_volunteer" type="submit" value="Approve Volunteer" onclick="return confirm('."'Do you want to approve $volunteer->firstname $volunteer->lastname as an official AYDN volunteer? This will create an Wordpress account for them.'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_volunteer" type="submit" value="Disapprove Volunteer" onclick="return confirm('."'Do you want to DENY $volunteer->firstname $volunteer->lastname from being an official AYDN volunteer?'".')" style="background-color: darkred;color:white;"><br /><br />';
@@ -135,6 +145,7 @@
 				echo "<span class=\"title\">Last Name:</span>$volunteer->lastname<br>";
 				echo "<span class=\"title\">Display Name:</span>$volunteer->name<br>";
 				echo "<span class=\"title\">AYDN #:</span>$volunteer->aydn_number<br>";
+				echo "<span class=\"title\">Total Approved Hours:</span>$total_hours_approved<br>";
 				echo "</div>";
 				echo "<div class=\"col-6\">";
 				echo "<span class=\"title\">Email:</span>$volunteer->email<br>";
@@ -187,20 +198,32 @@
 
 				// display hours by this volunteer
 				echo "<h2>$volunteer->name's Hours</h2>";
+				echo '<div class="card" style="max-width:100%;">
+				Start Date
+				<input type="date" style="width: 200px;" id="hours_search_start_date" value="'.$min_date.'" />
+				End Date
+				<input type="date" style="width: 200px;" id="hours_search_end_date"  value="'.$max_date.'"/>
+				<button type="button" id="hours_search" class="ui-button ui-widget ui-corner-all">Filter By Date Range</button><br /><br />
+				<strong>Total hours within date range:</strong> <span id="hours_submitted">'.$total_hours_submitted.'</span> 
+				hours submitted; <span id="hours_approved">'.$total_hours_approved.'</span> hours approved
+				</div>
+				';
 				echo '<div id="achours">';
 				foreach ($hours_results as $entry) {	
 					$status_color = ($entry->status == "Approved") ? "lightgreen" : (($entry->status == "New") ? "yellow" : "#999");
-					echo "<h3>$entry->event_date  -  $entry->event_type | status: <span style=\"background-color: $status_color; padding: 4px\">$entry->status</span></h3><div>";
-					echo '<div class="row">';
+					echo "<h3><span>$entry->event_date</span>  -  $entry->event_type | status: <span style=\"background-color: $status_color; padding: 4px\">$entry->status</span></h3><div>";
+					echo '<div class="hours_row">
+						<div class="row">';
 					echo "<div class=\"col-6\">";
 						echo "<span class=\"title\">Start Time:</span>$entry->start_time<br>";
 						echo "<span class=\"title\">Hours:</span>$entry->hours<br>";
 						echo "<span class=\"title\">Extra Hours:</span>$entry->extra_hours<br>";
+						echo "<span class=\"title\">Event Date:</span><span class=\"event_date\">$entry->event_date</span><br>";
 					echo "</div>";
 					echo "<div class=\"col-6\">";
 						echo "<span class=\"title\">End Time:</span>$entry->end_time<br>";
-						echo "<span class=\"title\">Total Hours:</span>$entry->total_hours<br>";
-						echo "<span class=\"title\">Status:</span>$entry->status<br>";
+						echo "<span class=\"title\">Total Hours:</span><span class=\"total_hours\">$entry->total_hours</span><br>";
+						echo "<span class=\"title\">Status:</span><span class=\"hours_status\">$entry->status</span><br>";
 					echo "</div>";
 					echo "</div>";
 					echo "
@@ -213,7 +236,7 @@
 					</div>";
 					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_hours" type="submit" value="Approve Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to approve this submission?'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_hours" type="submit" value="Disapprove Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to DENY this submission?'".')" style="background-color: darkred;color:white;"><br /><br />';
 					echo "<textarea style=\"width:100%;\" name=\"hours_deny_reason$entry->id\" placeholder=\"Reason For Denial\">$entry->deny_reason</textarea>";
-					echo"
+					echo "</div>
 					</div>
 					";
 
