@@ -34,11 +34,11 @@ class Aydn_Forms_Activator {
        Aydn_Forms_Activator::create_tables();
 
        // create pages
-       $page_title = 'AYDN Volunteer Signup Form';
+       $page_title = 'Signup';
        $page = get_page_by_title($page_title);
        if(!isset($page->title)){
 			$signup_page_args = array(
-				'post_title'   => __( $page_title, 'aydn_signup_form' ),
+				'post_title'   => __( $page_title, 'signup' ),
 				'post_content' => '[aydn_signup_form]',
 				'post_status'  => 'publish',
 				'post_type'    => 'page'
@@ -63,6 +63,9 @@ class Aydn_Forms_Activator {
 			// Save page id to the database.
 			add_option( 'my_aydn_page_id', $my_aydn_page_id );     	      	
        }
+
+	   // add an option for backup email address
+	   add_option('aydn_backup_email', 'aydn.hours@gmail.com');
 
 	}
 

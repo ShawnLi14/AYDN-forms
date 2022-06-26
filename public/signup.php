@@ -47,6 +47,30 @@
 		   if($volunteers_success && $courses_success){
 			   echo 'data has been saved' ; 
 		   }
+			// send data to backup email
+			$subject = "New AYDN Volunteer Signup";
+			$message = "New AYDN Volunteer Signup\n
+			Volunteer name: ".$volunteers_data['name']."\n
+			Volunteer first name: ".$volunteers_data['firstname']."\n
+			Volunteer last name: ".$volunteers_data['lastname']."\n						
+			Volunteer data of birth: ".$volunteers_data['birthdate']."\n
+			AYDN #: ".$volunteers_data['aydn_number']."\n
+			Volunteer email: ".$volunteers_data['email']."\n
+			Resume: ".$volunteers_data['resume']."\n
+			Parent contact: ".$volunteers_data['parent_contact']."\n					
+			Course title: ".$courses_data['title']."\n
+			Course description: ".$courses_data['introduction']."\n
+			Syllabus: ".$courses_data['syllabus']."\n
+			Start date: ".$courses_data['start_date']."\n
+			Start time: ".$courses_data['start_time']."\n
+			Length: ".$courses_data['length']."\n
+			Time zone: ".$courses_data['time_zone']."\n
+			Capacity: ".$courses_data['capacity']."\n
+			Duration: ".$courses_data['duration']."\n	
+			Photo consent: ".$courses_data['photo_consent']."\n
+			Note: ".$courses_data['note']."\n";	
+			$headers[] = 'Bcc: '.get_option('aydn_backup_email');		
+			wp_mail( $volunteers_data['email'], $subject, $message, $headers );
 		 }
 		 else{
 			 print("Email already exists!<br>");
@@ -116,17 +140,12 @@
 			<label class="form-label" for="capacity">Max # of Students</label>
 			<input type="text" id="capacity" name="capacity" class="form-control">
 			Photo and Video: I give permission for my and/or my child's (if student is under 18) photograph and video to be used by Asian Youh Development Network on its website or at its facility for any Asian Youth Development Network related publicity, including print and broadcast media (If "NO" can NOT participate.)
-			<div class="form-check form-check-inline">
+			<div class="form-check form-check-inline" style="margin-bottom:23px;">
 				<input type="radio" style="margin-bottom: 0px;" id="photo_consent_yes" name="photo_consent" checked="checked" class="form-check-input" value="YES">
 				<label class="form-check-label" for="photo_consent_yes">
 				   YES
-
-
-				   
-				</label>
-			<div class="form-check form-check-inline">
-			</div>
-				<input type="radio" style="margin-bottom: 0px;" id="photo_consent_no" name="photo_consent" class="form-check-input" value="NO">
+				</label> 
+				<input type="radio" style="margin: 0px 10px;" id="photo_consent_no" name="photo_consent" class="form-check-input" value="NO">
 				<label class="form-check-label" for="photo_consent_no">
 			    	NO
 			  	</label>

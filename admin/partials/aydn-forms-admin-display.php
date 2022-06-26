@@ -271,6 +271,16 @@
 			  	}
 			  	echo "</table>";
 		    }
+			// form to update settings
+			if(isset($_POST['update_backup_email'])){
+				$backup_email = $_POST['backup_email'];
+				update_option('aydn_backup_email', $backup_email);
+			}
 		?>
+		<h3>AYDN System Settings</h3>
+		<strong>Backup Email Address:</strong>
+		<input type="email" name="backup_email" value="<?php echo get_option('aydn_backup_email'); ?>" />
+		<input type="submit" name="update_backup_email" id="submit" class="button button-primary" value="Save Changes" />
 	</form>
+
 </div>

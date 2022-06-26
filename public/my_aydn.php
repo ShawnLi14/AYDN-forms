@@ -32,7 +32,7 @@
 	 	if(isset($_GET['entry']) && $_GET['entry'] == 'hours'){
 	 		// process hours submission
 	 		if(isset($_POST['hours_submit'])){
-	 			$hours_entry = array(
+	 			$courses_entry = array(
 	 				'event_type' => $_POST['event_type'],
 					'event_name' => $_POST['event_name'],
 	 				'event_date' => $_POST['event_date'],
@@ -45,12 +45,30 @@
 	 				'others' => $_POST['others'],
 	 				'volunteer_id' => $volunteer->id
 	 			);
-	 			$success = $wpdb->insert($hours_tablename, $hours_entry);
+	 			$success = $wpdb->insert($hours_tablename, $courses_entry);
 	 			if($success){
 	 				echo "Successfully submitted";
 	 				$url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
 	  				print("<br><a href='$url'>Return to Dashboard</a>");
 	 			}
+				// send data to backup email
+				$subject = "New AYDN Hours Submission";
+				$message = "New AYDN Hours Submission\n
+				Volunteer name: $volunteer->name\n
+				AYDN #: $volunteer->aydn_number\n
+				Volunteer email: $volunteer->email\n
+				Event type: ".$courses_entry['event_type']."\n
+				Event name: ".$courses_entry['event_name']."\n
+				Event date: ".$courses_entry['event_date']."\n
+				Event description: ".$courses_entry['event_description']."\n
+				Start time: ".$courses_entry['start_time']."\n
+				End time: ".$courses_entry['end_time']."\n
+				Hours: ".$courses_entry['hours']."\n
+				Extra hours: ".$courses_entry['extra_hours']."\n
+				Total hours: ".$courses_entry['total_hours']."\n	
+				Others: ".$courses_entry['others']."\n";
+				$headers[] = 'Bcc: '.get_option('aydn_backup_email');	
+				wp_mail( $email, $subject, $message, $headers );
 	 		}
 	 		// display hours form
 	 		else require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/hours.php';
@@ -77,6 +95,25 @@
 	 				$url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
 	  				print("<br><a href='$url'>Return to Dashboard</a>");
 	 			}
+				// send data to backup email
+				$subject = "New AYDN Course Submission";
+				$message = "New AYDN Course Submission\n
+				Volunteer name: $volunteer->name\n
+				AYDN #: $volunteer->aydn_number\n
+				Volunteer email: $volunteer->email\n
+				Course title: ".$courses_entry['title']."\n
+				Course description: ".$courses_entry['introduction']."\n
+				Syllabus: ".$courses_entry['syllabus']."\n
+				Start date: ".$courses_entry['start_date']."\n
+				Start time: ".$courses_entry['start_time']."\n
+				Length: ".$courses_entry['length']."\n
+				Time zone: ".$courses_entry['time_zone']."\n
+				Capacity: ".$courses_entry['capacity']."\n
+				Duration: ".$courses_entry['duration']."\n	
+				Photo consent: ".$courses_entry['photo_consent']."\n
+				Note: ".$courses_entry['note']."\n";	
+				$headers[] = 'Bcc: '.get_option('aydn_backup_email');			
+				wp_mail( $email, $subject, $message, $headers);
 	 		}
 	 		else require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/courses.php';
 	 	}

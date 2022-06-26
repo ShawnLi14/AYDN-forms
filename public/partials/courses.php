@@ -37,14 +37,12 @@
 				<option value="2 Hours"></option>
 			</datalist>
 			Photo and Video: I give permission for my and/or my child's (if student is under 18) photograph and video to be used by Asian Youh Development Network on its website or at its facility for any Asian Youth Development Network related publicity, including print and broadcast media (If "NO" can NOT participate.)
-			<div class="form-check form-check-inline">
+			<div class="form-check form-check-inline" style="margin-bottom:23px;">
 				<input type="radio" style="margin-bottom: 0px;" id="photo_consent_yes" name="photo_consent" checked="checked" class="form-check-input" value="YES">
 				<label class="form-check-label" for="photo_consent_yes">
 				   YES
-				</label>
-			<div class="form-check form-check-inline">
-			</div>
-				<input type="radio" style="margin-bottom: 0px;" id="photo_consent_no" name="photo_consent" class="form-check-input" value="NO">
+				</label> 
+				<input type="radio" style="margin: 0px 10px;" id="photo_consent_no" name="photo_consent" class="form-check-input" value="NO">
 				<label class="form-check-label" for="photo_consent_no">
 			    	NO
 			  	</label>
