@@ -69,6 +69,13 @@
 			$('#hours_submitted').text(totalHours);
 			$('#hours_approved').text(approvedHours);
 		});
+		$('#volunteer_filter').click(function(){
+			var start = $('#volunteer_start_date').val();
+			var end = $('#volunteer_end_date').val();
+			$(location).prop('href', 'http://stackoverflow.com')
+			location.href = "https://google.com";
+			window.location.replace(window.location.href + '&volunteer_start_date=' + start + '&volunteer_end_date=' + end);
+		});
     });
 
 })( jQuery );

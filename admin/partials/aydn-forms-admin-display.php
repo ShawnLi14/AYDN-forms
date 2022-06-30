@@ -161,7 +161,7 @@
 				echo "<h2>$volunteer->name's Courses</h2>";
 				echo '<div id="accourses">';
 				foreach ($courses_results as $course) {			
-					$status_color = ($course->status == "Approved") ? "lightgreen" : (($course->status == "New") ? "yellow" : "#999");
+					$status_color = ($course->status == "Approved") ? "lightgreen" : (($course->status == "New") ? "gold" : "#999");
 					echo "<h3>Course Title: $course->title | Status: <span style=\"background-color: $status_color; padding: 4px\">$course->status</span></h3><div>";
 					echo '<div class="row">';
 					echo "<div class=\"col-6\">";
@@ -210,7 +210,7 @@
 				';
 				echo '<div id="achours">';
 				foreach ($hours_results as $entry) {	
-					$status_color = ($entry->status == "Approved") ? "lightgreen" : (($entry->status == "New") ? "yellow" : "#999");
+					$status_color = ($entry->status == "Approved") ? "lightgreen" : (($entry->status == "New") ? "gold" : "#999");
 					echo "<h3><span>$entry->event_date</span>  -  $entry->event_type | status: <span style=\"background-color: $status_color; padding: 4px\">$entry->status</span></h3><div>";
 					echo '<div class="hours_row">
 						<div class="row">';
@@ -245,14 +245,44 @@
 			}
 
 			else{
-			 	// pull volunteer list
-			 	$sql = "SELECT * from $volunteers_tablename";  
-			  	$results = $wpdb->get_results($sql);
-			  	echo '<table class="table"><tr style="background-color:cornsilk;">
+				// pull volunteer list
+				$sql = "SELECT *, (select sum(total_hours) from $hours_tablename where volunteer_id=v.id and status='Approved') as hours, 
+				(select count(status) from $hours_tablename where volunteer_id=v.id and status='New') as hours_action_count, 
+				(select count(status) from $courses_tablename where volunteer_id=v.id and status='New') as courses_action_count
+				from $volunteers_tablename v";
+				
+				//filter hours by dates
+				$start = ""; $end = "";
+				if(isset($_POST['volunteer_start_date']) && strlen($_POST['volunteer_start_date']) > 0 && isset($_POST['volunteer_end_date']) && strlen($_POST['volunteer_end_date']) > 0){
+					$start = $_POST['volunteer_start_date'];
+					$end = $_POST['volunteer_end_date'];
+					$sql = "SELECT *, (select sum(total_hours) from $hours_tablename where volunteer_id=v.id and status='Approved' and (event_date between '$start' and '$end')) as hours,
+					(select count(status) from $hours_tablename where volunteer_id=v.id and status='New') as hours_action_count, 
+					(select count(status) from $courses_tablename where volunteer_id=v.id and status='New') as courses_action_count
+					from $volunteers_tablename v";
+				}
+				$results = $wpdb->get_results($sql);
+				echo '<div class="row">';
+				echo '<label for="volunteer_start_date" class="form-label">Start Date</label>';
+				echo '<input class="form-contol" value="'.$start.'" type="date" name="volunteer_start_date" style="margin: 10px 50px 10px 10px;">';
+				echo '<label for="volunteer_end_date" class="form-label">End Date</label>';
+				echo '<input type="date" value="'.$end.'" name="volunteer_end_date" style="margin: 10px 20px 10px 10px;">';
+				echo '
+				  	Action Required?
+				  <input class="form-check-input" type="checkbox" value="on" name="filterByActionRequired" style="margin-right: 20px;" '; if(isset($_POST['filterByActionRequired'])){echo 'checked';} echo '>
+				  	New Volunteers?
+				  <input class="form-check-input" type="checkbox" value="on" name="filterByNewVolunteers" style="margin-right: 20px;" '; if(isset($_POST['filterByNewVolunteers'])){echo 'checked';} echo '>
+				  ';
+				  echo '<button class="button button-primary" name="volunteer_filter" form="aydn-admin" style="vertical-align: middle;">Filter</button>';
+				echo '</div>';
+				echo '<table class="table"><tr style="background-color:cornsilk;">
+				<th></th>
 			  	<th>First Name</th>
 			  	<th>Last Name</th>
+				<th>Date of Birth</th>
 			  	<th>AYDN #</th>
 			  	<th>Email</th>
+				<th>Approved Hours</th>
 			  	<th>Status</th>
 			  	<th></th>
 			  	</tr>';
@@ -260,14 +290,22 @@
 			  	for($i = 0; $i < count($results); $i++){
 			  		if($i % 2 == 0) $bgcolor = '#eee';
 			  		else $bgcolor = '#fff';
-			  		echo "<tr style=\"background-color:$bgcolor;\">";
-			  		echo "<td>".$results[$i]->firstname."</td>";
-			  		echo "<td>".$results[$i]->lastname."</td>";	  
-			  		echo "<td>".$results[$i]->aydn_number."</td>";	  
-			  		echo "<td>".$results[$i]->email."</td>";
-			  		echo "<td>".$results[$i]->status."</td>";	
-			  		echo '<td><a href="'.$uri.'&vid='.$results[$i]->id.'">View Details</a></td>';		
-			  		echo "</tr>";
+					$actionRequired = $results[$i]->hours_action_count != 0 || $results[$i]->courses_action_count != 0;
+					if(!isset($_POST['filterByActionRequired']) || (isset($_POST['filterByActionRequired']) && $actionRequired)){
+						if(!isset($_POST['filterByNewVolunteers']) || (isset($_POST['filterByNewVolunteers']) && $results[$i]->status == 'New')){
+							echo "<tr style=\"background-color:$bgcolor;\">";
+							echo $actionRequired ? "<td style=\"color: red; font-weight: bold;\">!</td>" : "<td></td>";
+							echo "<td>".$results[$i]->firstname."</td>";
+							echo "<td>".$results[$i]->lastname."</td>";	
+							echo "<td>".$results[$i]->birthdate."</td>";	
+							echo "<td>".$results[$i]->aydn_number."</td>";	  
+							echo "<td>".$results[$i]->email."</td>";
+							echo "<td>".$results[$i]->hours."</td>";
+							echo "<td>".$results[$i]->status."</td>";	
+							echo '<td><a href="'.$uri.'&vid='.$results[$i]->id.'">View Details</a></td>';		
+							echo "</tr>";
+						}
+					}
 			  	}
 			  	echo "</table>";
 		    }
