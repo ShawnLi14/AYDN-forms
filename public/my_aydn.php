@@ -14,10 +14,10 @@
 	 	$courses_tablename = $wpdb->prefix."aydn_courses";
 	 	$hours_tablename = $wpdb->prefix."aydn_hours";
 	 	$sql = "select h.* from $hours_tablename h join $volunteers_tablename v on h.volunteer_id = v.id
-	 	where v.email = '%s' order by h.event_date";
+	 	where v.email = '%s' order by h.status";
 	 	$hours_results = $wpdb->get_results($wpdb->prepare($sql, $email));
 	 	$sql = "select c.* from $courses_tablename c join $volunteers_tablename v on c.volunteer_id = v.id
-	 	where v.email = '%s'";
+	 	where v.email = '%s' order by c.status";
 	 	$courses_results = $wpdb->get_results($wpdb->prepare($sql, $email));
 	 	$sql = "select * from $volunteers_tablename where email = '%s'";
 	 	$volunteer_results = $wpdb->get_results($wpdb->prepare($sql, $email));
@@ -190,8 +190,11 @@
 						 			<td>$entry->hours</td>
 						 			<td>$entry->extra_hours</td>
 									<td class=\"total_hours\">$entry->total_hours</td>
-						 			<td class=\"hours_status\" style=\"background-color: $status_color\">$entry->status</td>
-						 			</tr>
+						 			<td class=\"hours_status\" style=\"background-color: $status_color\">$entry->status";
+									if($entry->status == 'Rejected') echo "<button type=\"button\" class=\"showReason btn btn-primary\" id=\"viewReason_$i\">View Reason</button>";
+									echo "</td>";
+									echo "</tr>";
+									echo "<tr id=\"reason_$i\" style=\"display: none\"><td colspan=\"6\">$entry->deny_reason</td></tr>
 						 		";
 								$i++;
 						 	}

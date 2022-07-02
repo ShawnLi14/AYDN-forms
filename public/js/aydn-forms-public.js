@@ -71,5 +71,17 @@
 			$('#hours_submitted').text(totalHours);
 			$('#hours_approved').text(approvedHours);
 		});
+		$('.showReason').click(function(){
+			var id = $(this).attr('id');
+			var reasonID = id.substring(id.indexOf('_') + 1);
+			if($('#reason_' + reasonID).is(":hidden")){
+				$('#reason_' + reasonID).show();
+				$(this).text("Hide Reason");
+			}
+			else{
+				$('#reason_' + reasonID).hide();
+				$(this).text("Show Reason");
+			}
+		});
 	});
 })( jQuery );

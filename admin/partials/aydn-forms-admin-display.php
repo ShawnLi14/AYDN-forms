@@ -109,11 +109,11 @@
 				}				
 
 				//pull course info
-				$sql = "SELECT * from $courses_tablename where volunteer_id='%d' order by title";
+				$sql = "SELECT * from $courses_tablename where volunteer_id='%d' order by status, title";
 				$courses_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
 
 				//pull hours info
-				$sql = "SELECT * from $hours_tablename where volunteer_id='%d' order by event_date";
+				$sql = "SELECT * from $hours_tablename where volunteer_id='%d' order by status, event_date";
 				$hours_results = $wpdb->get_results($wpdb->prepare($sql, $vid));
 
 				//calculate total hours
@@ -211,7 +211,7 @@
 				echo '<div id="achours">';
 				foreach ($hours_results as $entry) {	
 					$status_color = ($entry->status == "Approved") ? "lightgreen" : (($entry->status == "New") ? "gold" : "#999");
-					echo "<h3><span>$entry->event_date</span>  -  $entry->event_type | status: <span style=\"background-color: $status_color; padding: 4px\">$entry->status</span></h3><div>";
+					echo "<h3><span>$entry->event_date</span>  -  $entry->event_name, $entry->total_hours hr(s) | <span style=\"background-color: $status_color; padding: 4px\">$entry->status</span></h3><div>";
 					echo '<div class="hours_row">
 						<div class="row">';
 					echo "<div class=\"col-6\">";
@@ -221,6 +221,7 @@
 						echo "<span class=\"title\">Event Date:</span><span class=\"event_date\">$entry->event_date</span><br>";
 					echo "</div>";
 					echo "<div class=\"col-6\">";
+						echo "<span class=\"title\">Event Type:</span>$entry->event_type<br>";
 						echo "<span class=\"title\">End Time:</span>$entry->end_time<br>";
 						echo "<span class=\"title\">Total Hours:</span><span class=\"total_hours\">$entry->total_hours</span><br>";
 						echo "<span class=\"title\">Status:</span><span class=\"hours_status\">$entry->status</span><br>";
