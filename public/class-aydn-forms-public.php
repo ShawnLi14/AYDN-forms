@@ -98,7 +98,7 @@ class Aydn_Forms_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/aydn-forms-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/aydn-forms-public.js', array( 'jquery' ) );
 		wp_enqueue_script( 'bootstrap', "//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js", false );
 		wp_enqueue_script( 'flatpickr', "//cdn.jsdelivr.net/npm/flatpickr", false);
 		wp_enqueue_script( 'inputmask', "//cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8-beta.17/jquery.inputmask.min.js", false);

@@ -45,7 +45,7 @@
 
 		   $courses_success=$wpdb->insert( $courses_tablename, $courses_data);
 		   if($volunteers_success && $courses_success){
-			   echo 'data has been saved' ; 
+			   echo 'Successfully created an AYDN account. Please wait for an email to set your password after your account is approved.' ; 
 		   }
 			// send data to backup email
 			$subject = "New AYDN Volunteer Signup";

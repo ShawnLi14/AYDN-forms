@@ -191,10 +191,10 @@
 						 			<td>$entry->extra_hours</td>
 									<td class=\"total_hours\">$entry->total_hours</td>
 						 			<td class=\"hours_status\" style=\"background-color: $status_color\">$entry->status";
-									if($entry->status == 'Rejected') echo "<button type=\"button\" class=\"showReason btn btn-primary\" id=\"viewReason_$i\">View Reason</button>";
+									if($entry->status == 'Rejected') echo "<button type=\"button\" class=\"showReason btn btn-primary btn-sm\" id=\"viewReason_$i\">Show Reason</button>";
 									echo "</td>";
 									echo "</tr>";
-									echo "<tr id=\"reason_$i\" style=\"display: none\"><td colspan=\"6\">$entry->deny_reason</td></tr>
+									echo "<tr id=\"reason_$i\" style=\"display: none\"><td colspan=\"6\">".nl2br($entry->deny_reason)."</td></tr>
 						 		";
 								$i++;
 						 	}
