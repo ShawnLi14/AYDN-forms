@@ -79,7 +79,7 @@ class Aydn_Forms_Activator {
 	  $volunteers_tablename = $wpdb->prefix."aydn_volunteers";
 	  $sql = "CREATE TABLE IF NOT EXISTS $volunteers_tablename (
 	  id mediumint(11) NOT NULL AUTO_INCREMENT,
-	  name varchar(80) NOT NULL,
+	  name varchar(80) NOT NULL, 
 	  firstname varchar(50) NOT NULL,
 	  lastname varchar(50) NOT NULL,
 	  birthdate date NOT NULL,
@@ -87,6 +87,8 @@ class Aydn_Forms_Activator {
 	  aydn_number varchar(50) NOT NULL,
 	  resume varchar(65535),
 	  parent_contact varchar(255),
+	  phone varchar(50),
+	  parent_phone varchar(50),
 	  status varchar(20) NOT NULL DEFAULT 'New',
 	  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  	  date_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

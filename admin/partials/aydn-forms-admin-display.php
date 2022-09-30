@@ -51,6 +51,8 @@
 						'aydn_number' => $_POST['edit_aydn_number'],
 						'resume' => $_POST['edit_resume'],
 						'parent_contact' => $_POST['edit_parent_contact'],
+						'phone' => $_POST['edit_phone'],
+						'parent_phone' => $_POST['edit_parent_phone'],
 						'status' => $_POST['edit_status']
 					);
 					$wpdb->update($volunteers_tablename, $updatedData, array('id'=>$vid));
@@ -66,6 +68,8 @@
 					<strong>aydn_number</strong>: ". $_POST['edit_aydn_number']."<br />
 					<strong>resume</strong>: ". $_POST['edit_resume']."<br />
 					<strong>parent_contact</strong>: ". $_POST['edit_parent_contact']."<br />
+					<strong>phone</strong>: ". $_POST['edit_phone']."<br />
+					<strong>parent_phone</strong>: ". $_POST['edit_parent_phone']."<br />
 					<strong>status</strong>: ". $_POST['edit_status'];
 					$headers = array('Content-Type: text/html; charset=UTF-8');
 					
@@ -310,13 +314,13 @@
 				echo "<br /><span class=\"title\">AYDN #:</span>";
 				if($editing) echo "<input type='text' name='edit_aydn_number' value='$volunteer->aydn_number' />";
 				else echo $volunteer->aydn_number;
-				echo "<br /><span class=\"title\">Total Approved Hours:</span>$total_hours_approved<br>";
-				echo "</div>";
-				echo "<div class=\"col-6\">";
-				echo "<span class=\"title\">Email:</span>";
+				echo "<br /><span class=\"title\">Email:</span>";
 				if($editing) echo "<input type='text' name='edit_email' value='$volunteer->email' />";
 				else echo $volunteer->email;
-				echo "<br /><span class=\"title\">Status:</span>";
+				echo "<br /><span class=\"title\">Total Approved Hours:</span>$total_hours_approved<br>";				
+				echo "</div>";
+				echo "<div class=\"col-6\">";				
+				echo "<span class=\"title\">Status:</span>";
 				if($editing) echo "<input type='text' name='edit_status' value='$volunteer->status' />";
 				else echo $volunteer->status;
 				echo "<br /><span class=\"title\">Birth Date:</span>";
@@ -325,6 +329,12 @@
 				echo "<br /><span class=\"title\">Parent Contact:</span>";
 				if($editing) echo "<input type='text' name='edit_parent_contact' value='$volunteer->parent_contact' />";
 				else echo $volunteer->parent_contact;				
+				echo "<br /><span class=\"title\">Volunteer Phone:</span>";
+				if($editing) echo "<input type='text' name='edit_phone' value='$volunteer->phone' />";
+				else echo $volunteer->phone;
+				echo "<br /><span class=\"title\">Parent Phone:</span>";
+				if($editing) echo "<input type='text' name='edit_parent_phone' value='$volunteer->parent_phone' />";
+				else echo $volunteer->parent_phone;				
 				echo "<br /></div></div>";
 				echo "<div class=\"row\" id=\"resume\">";
 				echo "<h3>Resume:</h3><div>";

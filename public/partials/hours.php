@@ -27,7 +27,7 @@
 			<label class="form-label" for="extra_hours">Extra Hour(s)</label>
 			<input type="number" step="0.01" min="0" id="extra_hours" name="extra_hours" class="form-control hour">
 			<label class="form-label" for="total_hours">Total Hour(s)</label>
-			<input type="number" step="0.01" min="0" id="total_hours" name="total_hours" class="form-control">
+			<input type="number" step="0.01" min="0" id="total_hours" name="total_hours" class="form-control" required>
 			<label class="form-label" for="others">Others</label>			
 			<textarea id="others" name="others" rows="10" class="form-control"></textarea>		
 		</div>										

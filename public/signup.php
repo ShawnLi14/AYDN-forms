@@ -23,6 +23,8 @@
 			   'aydn_number' => $_POST['aydn_number'],
 			   'resume' => $_POST['resume'],
 			   'parent_contact' => $_POST['parent_contact'],
+			   'phone' => $_POST['v_phone'],
+			   'parent_phone' => $_POST['parent_phone'],
 			   'status' => $status
 		   );
 
@@ -57,7 +59,9 @@
 			AYDN #: ".$volunteers_data['aydn_number']."\n
 			Volunteer email: ".$volunteers_data['email']."\n
 			Resume: ".$volunteers_data['resume']."\n
-			Parent contact: ".$volunteers_data['parent_contact']."\n					
+			Parent contact: ".$volunteers_data['parent_contact']."\n
+			Phone: ".$volunteers_data['phone']."\n
+			Parent phone: ".$volunteers_data['parent_phone']."\n					
 			Course title: ".$courses_data['title']."\n
 			Course description: ".$courses_data['introduction']."\n
 			Syllabus: ".$courses_data['syllabus']."\n
@@ -98,7 +102,11 @@
 			<label class="form-label" for="aydn_number">AYDN #</label>
 			<input type="text" id="aydn_number" name="aydn_number" class="form-control" required>
 			<label class="form-label" for="parent_contact">Parent(s) Wechat or Email</label>
-			<input type="text" id="parent_contact" name="parent_contact" class="form-control">
+			<input type="text" id="parent_contact" name="parent_contact" class="form-control" required>
+			<label class="form-label" for="v_phone">Volunteer Phone Number</label>
+			<input type="text" id="v_phone" name="v_phone" class="form-control">
+			<label class="form-label" for="parent_phone">Parent Phone Number</label>
+			<input type="text" id="parent_phone" name="parent_phone" class="form-control">
 			<label class="form-label" for="resume">Resume (Summary/Name/Education/Skills & Experience/Awards)</label>
 			<textarea id="resume" name="resume" rows="10" class="form-control"></textarea>											
 		</div>
