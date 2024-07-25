@@ -54,8 +54,8 @@
 				$('#achours .hours_row').each(function() {
 					var date = Date.parse($(this).find('.event_date').text());
 					if(date <= end_date && date >= start_date){
-						totalHours += parseInt($(this).find('.total_hours').text());
-						if($(this).find('.hours_status').text() == "Approved") approvedHours += parseInt($(this).find('.total_hours').text());
+						totalHours += parseFloat($(this).find('.total_hours').text());
+						if($(this).find('.hours_status').text() == "Approved") approvedHours += parseFloat($(this).find('.total_hours').text());
 						$(this).show();
 						$(this).parent().prev().show();
 					}
@@ -72,9 +72,10 @@
 		$('#volunteer_filter').click(function(){
 			var start = $('#volunteer_start_date').val();
 			var end = $('#volunteer_end_date').val();
-			$(location).prop('href', 'http://stackoverflow.com')
-			location.href = "https://google.com";
-			window.location.replace(window.location.href + '&volunteer_start_date=' + start + '&volunteer_end_date=' + end);
+			var lname = $('#volunteer_lname').val();
+			$(location).prop('href', 'https://www.aydnetwork.org/')
+			location.href = "https://www.aydnetwork.org/";
+			window.location.replace(window.location.href + '&volunteer_start_date=' + start + '&volunteer_end_date=' + end + '&volunteer_lname=' + lname);
 		});
     });
 

@@ -26,3 +26,6 @@
   font-weight: bold;
   width: 150px;
 }
+.hours_row input[type="text"], .hours_row textarea{
+  width: 100%;
+}

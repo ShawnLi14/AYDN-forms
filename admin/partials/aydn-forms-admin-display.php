@@ -31,14 +31,93 @@
 		 	$courses_tablename = $wpdb->prefix."aydn_courses";
 		 	$hours_tablename = $wpdb->prefix."aydn_hours";
 
+			// edit hours
+			if(isset($_GET['hid'])){
+				// get volunteer id
+				$vid = $_GET['vid'];
+				// get hour id
+				$hid = $_GET['hid'];
+				$hours_updated = false;
+                
+				// update hour info
+				if(isset($_POST['update_hours'])){
+					$updatedData = array(
+						'event_name' => $_POST['h_event_name'],
+						'event_type' => $_POST['h_event_type'],
+						'event_date' => $_POST['h_event_date'],
+						'start_time' => $_POST['h_start_time'],
+						'end_time' => $_POST['h_end_time'],
+						'event_description' => $_POST['h_event_description'],
+						'hours' => $_POST['h_hours'],
+						'extra_hours' => $_POST['h_extra_hours'],
+						'total_hours' => $_POST['h_total_hours'],
+						'others' => $_POST['h_others'],
+						'status' => $_POST['h_status']
+					);
+					$wpdb->update($hours_tablename, $updatedData, array('id'=>$hid));
+
+					//backup email
+					$subject = "Volunteer Hours Updated.";
+					$body = "Here are updated volunteer hours details. Volunteer information: https://www.aydnetwork.org/wp-admin/admin.php?page=aydn-forms-admin&vid=$vid<br />
+					<strong>Event name</strong>: ". $_POST['h_event_name']."<br />
+					<strong>Event type</strong>: ". $_POST['h_event_type']."<br />
+					<strong>Event date</strong>: ". $_POST['h_event_date']."<br />
+					<strong>Start time</strong>: ". $_POST['h_start_time']."<br />
+					<strong>End time</strong>: ". $_POST['h_end_time']."<br />
+					<strong>Event description</strong>: ". $_POST['h_event_description']."<br />
+					<strong>Hours</strong>: ". $_POST['h_hours']."<br />
+					<strong>Extra hours</strong>: ". $_POST['h_extra_hours']."<br />
+					<strong>Total hours</strong>: ". $_POST['h_total_hours']."<br />
+					<strong>Others</strong>: ". $_POST['h_others']."<br />
+					<strong>status</strong>: ". $_POST['h_status'];
+					$headers = array('Content-Type: text/html; charset=UTF-8');
+					
+					wp_mail(get_option('aydn_backup_email'), $subject, $body, $headers);
+					$hours_updated = true;					
+
+				}
+				//display hours eidting form
+				// pull hours info
+				$sql = "SELECT * from $hours_tablename where id='%d'";
+				$volunteer_results = $wpdb->get_results($wpdb->prepare($sql, $hid));
+				$hours = $volunteer_results[0];
+				$breadcrumb = "<a href=\"$homeURL\">Admin Home</a> > <a href=\"$homeURL&vid=$vid\">Volunteer Details</a> > Edit Hours";
+				echo "$breadcrumb<br><br>";
+				echo "<h2>Edit Hours</h2>";
+				// form to edit hours
+				echo '<div class="hours_row">
+					<div class="row">';
+				echo "<div class=\"col-6\">";
+				echo "<span class='title'>Event Name:</span><input type='text' name='h_event_name' value='$hours->event_name' /><br />";
+				echo "<span class='title'>Event Type:</span><input type='text' name='h_event_type' value='$hours->event_type' /><br />";
+				echo "<span class='title'>Event Date:</span><input type='text' name='h_event_date' value='$hours->event_date' /><br />";
+				echo "<span class='title'>Start Time:</span><input type='text' name='h_start_time' value='$hours->start_time' /><br />";
+				echo "<span class='title'>End Time:</span><input type='text' name='h_end_time' value='$hours->end_time' /><br />";
+				echo "<span class='title'>Course Description:</span><textarea name='h_event_description'>$hours->event_description</textarea>";
+				echo "</div>";
+				echo "<div class=\"col-6\">";
+				echo "<span class='title'>Hours:</span><input type='text' name='h_hours' value='$hours->hours' /><br />";
+				echo "<span class='title'>Extra Hours:</span><input type='text' name='h_extra_hours' value='$hours->extra_hours' /><br />";
+				echo "<span class='title'>Total Hours:</span><input type='text' name='h_total_hours' value='$hours->total_hours' /><br />";
+				echo "<span class='title'>Status:</span><input type='text' name='h_status' value='$hours->status' /><br />";
+				echo "<span class='title'>Extra Notes:</span><textarea name='h_others'>$hours->others</textarea>";
+				echo "</div>";
+				echo "</div>";
+				if($hours_updated) echo "Changes saved. If everything looks good, click on Back to Volunteer Details button below to go back to the volunteer information page.";
+				echo "<br><br>
+				<input class='ui-button ui-widget ui-corner-all' name='update_hours' type='submit' value='Save Hours Changes'
+				onclick=\"return confirm('Do you want to save changes?')\" style='background-color: darkred;color:white;'>
+				<a class='ui-button ui-widget ui-corner-all' href='".$homeURL.'&vid='.$vid."' style='background-color: aqua;'>Back to Volunteer Details</a><br /><br />";				
+			}
+
 			// view details for volunteer with vid
-			if(isset($_GET['vid'])){
+			elseif(isset($_GET['vid'])){
 
 				//get volunteer id
 				$vid = $_GET['vid'];
 				//get editing status. editing is true only when url has &editing=1
 				$editing = false;
-				if(isset($_POST['editing'])) $editing = true;
+				if(isset($_POST['editing'])) $editing = true;				
 
 				//update volunteer
 				if(isset($_POST['update_volunteer'])){
@@ -295,7 +374,7 @@
 				$breadcrumb = "<a href=\"$homeURL\">Admin Home</a> > Volunteer Details - $volunteer->name";
 
 				// display volunteer personal information
-				echo "$breadcrumb<br><br>";
+				echo "$breadcrumb<br><br><h2>Volunteer Details</h2>";
 				echo '<input class="ui-button ui-widget ui-corner-all" name="approve_volunteer" type="submit" value="Approve Volunteer" onclick="return confirm('."'Do you want to approve $volunteer->firstname $volunteer->lastname as an official AYDN volunteer? This will create an Wordpress account for them.'".')" style="background-color: aquamarine;">
 				<input class="ui-button ui-widget ui-corner-all" name="disapprove_volunteer" type="submit" value="Disapprove Volunteer" onclick="return confirm('."'Do you want to DENY $volunteer->firstname $volunteer->lastname from being an official AYDN volunteer?'".')" style="background-color: darkred;color:white;">
 				<input class="ui-button ui-widget ui-corner-all" name="editing" type="submit" value="Edit Volunteer" style="background-color: yellow;float: right;"> 
@@ -421,7 +500,11 @@
 					<div class=\"row\">
 						<span class=\"title\">Extra Notes:</span><br>$entry->others
 					</div>";
-					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_hours" type="submit" value="Approve Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to approve this submission?'".')" style="background-color: aquamarine;"> <input class="ui-button ui-widget ui-corner-all" name="disapprove_hours" type="submit" value="Disapprove Hours #'.$entry->id.'" onclick="return confirm('."'Do you want to DENY this submission?'".')" style="background-color: darkred;color:white;"><br /><br />';
+					echo '<input class="ui-button ui-widget ui-corner-all" name="approve_hours" type="submit" value="Approve Hours #'.$entry->id.
+					'" onclick="return confirm('."'Do you want to approve this submission?'".')" style="background-color: aquamarine;"> 
+					<input class="ui-button ui-widget ui-corner-all" name="disapprove_hours" type="submit" value="Disapprove Hours #'.$entry->id.
+					'" onclick="return confirm('."'Do you want to DENY this submission?'".')" style="background-color: darkred;color:white;">
+					<a class="ui-button ui-widget ui-corner-all" href="'.$homeURL.'&vid='.$vid.'&hid='.$entry->id.'" style="background-color: aqua;">Edit Hours</a><br /><br />';
 					echo "<textarea style=\"width:100%;\" name=\"hours_deny_reason$entry->id\" placeholder=\"Reason For Denial\">$entry->deny_reason</textarea>";
 					echo "</div>
 					</div>
@@ -432,28 +515,48 @@
 			}
 
 			else{
+				$sort = 'aydn_number';
+				if(isset($_GET['sort'])) $sort = $_GET['sort'];
 				// pull volunteer list
 				$sql = "SELECT *, (select sum(total_hours) from $hours_tablename where volunteer_id=v.id and status='Approved') as hours, 
 				(select count(status) from $hours_tablename where volunteer_id=v.id and status='New') as hours_action_count, 
 				(select count(status) from $courses_tablename where volunteer_id=v.id and status='New') as courses_action_count
 				from $volunteers_tablename v";
 				
-				//filter hours by dates
-				$start = ""; $end = "";
-				if(isset($_POST['volunteer_start_date']) && strlen($_POST['volunteer_start_date']) > 0 && isset($_POST['volunteer_end_date']) && strlen($_POST['volunteer_end_date']) > 0){
+				//filter hours by dates or last name
+				$start = "2022-01-01"; 
+				$end = "2030-01-01"; 
+				$lname = ""; 
+				$reload = false;
+				if(isset($_POST['volunteer_start_date']) && strlen($_POST['volunteer_start_date']) > 0) {
 					$start = $_POST['volunteer_start_date'];
-					$end = $_POST['volunteer_end_date'];
-					$sql = "SELECT *, (select sum(total_hours) from $hours_tablename where volunteer_id=v.id and status='Approved' and (event_date between '$start' and '$end')) as hours,
-					(select count(status) from $hours_tablename where volunteer_id=v.id and status='New') as hours_action_count, 
-					(select count(status) from $courses_tablename where volunteer_id=v.id and status='New') as courses_action_count
-					from $volunteers_tablename v";
+					$reload = true;
 				}
+				if(isset($_POST['volunteer_end_date']) && strlen($_POST['volunteer_end_date']) > 0) {
+					$end = $_POST['volunteer_end_date'];
+					$reload = true;
+				}
+				if(isset($_POST['volunteer_lname']) && strlen($_POST['volunteer_lname']) > 0) {
+					$lname = $_POST['volunteer_lname'];
+					$reload = true;
+				}
+				if($reload){
+					$sql = "SELECT *, (select sum(total_hours) from $hours_tablename where volunteer_id=v.id and status='Approved' 
+					and (event_date between '$start' and '$end')) as hours,
+					(select count(status) from $hours_tablename where volunteer_id=v.id and status='New') as hours_action_count, 
+					(select count(status) from $courses_tablename where volunteer_id=v.id and status='New') as courses_action_count";	
+					$sql .= " from $volunteers_tablename v";
+					if(strlen($lname) > 0) $sql .= " where lastname = '$lname'";
+				}
+				if($sort) $sql .= ' order by '.$sort;
 				$results = $wpdb->get_results($sql);
 				echo '<div class="row">';
 				echo '<label for="volunteer_start_date" class="form-label">Start Date</label>';
 				echo '<input class="form-contol" value="'.$start.'" type="date" name="volunteer_start_date" style="margin: 10px 50px 10px 10px;">';
 				echo '<label for="volunteer_end_date" class="form-label">End Date</label>';
 				echo '<input type="date" value="'.$end.'" name="volunteer_end_date" style="margin: 10px 20px 10px 10px;">';
+				echo '<label for="volunteer_lname" class="form-label">Last Name</label>';
+				echo '<input type="text" value="'.$lname.'" name="volunteer_lname" style="margin: 10px 20px 10px 10px; width: 100px;">';
 				echo '
 				  	Action Required?
 				  <input class="form-check-input" type="checkbox" value="on" name="filterByActionRequired" style="margin-right: 20px;" '; if(isset($_POST['filterByActionRequired'])){echo 'checked';} echo '>
@@ -495,17 +598,22 @@
 					}
 			  	}
 			  	echo "</table>";
-		    }
-			// form to update settings
-			if(isset($_POST['update_backup_email'])){
-				$backup_email = $_POST['backup_email'];
-				update_option('aydn_backup_email', $backup_email);
+
+				// form to update settings
+				if(isset($_POST['update_backup_email'])){
+					$backup_email = $_POST['backup_email'];
+					update_option('aydn_backup_email', $backup_email);
+				}
 			}
+			?>
+			<h3>AYDN System Settings</h3>
+			<strong>Backup Email Address:</strong>
+			<input type="email" name="backup_email" value="<?php echo get_option('aydn_backup_email'); ?>" />
+			<input type="submit" name="update_backup_email" id="submit" class="button button-primary" value="Save Changes" />
+	    <?php 
+			// print sql for debug
+			echo "<div style='visibility:hidden;'>$sql</div>";
 		?>
-		<h3>AYDN System Settings</h3>
-		<strong>Backup Email Address:</strong>
-		<input type="email" name="backup_email" value="<?php echo get_option('aydn_backup_email'); ?>" />
-		<input type="submit" name="update_backup_email" id="submit" class="button button-primary" value="Save Changes" />
-	</form>
+		</form>
 
 </div>
